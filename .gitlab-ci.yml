@@ -1,0 +1,40 @@
+# Định nghĩa các stage trong pipeline
+stages:
+  - build
+  - test
+  - deploy
+
+# Job Build
+build:
+  stage: build
+  script:
+    - echo "Building project..."
+    - npm install   # Cài đặt các dependencies (cho Node.js)
+    - npm run build  # Xây dựng dự án
+
+# Job Test
+test:
+  stage: test
+  script:
+    - echo "Running tests..."
+    - npm run test   # Chạy các bài kiểm tra
+
+# Job Deploy to Staging
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploying to staging..."
+    - docker build -t myapp:staging .  # Build Docker image
+    - docker run -d myapp:staging     # Chạy container trên staging
+  only:
+    - develop  # Chỉ deploy khi có thay đổi trên nhánh develop
+
+# Job Deploy to Production
+deploy_production:
+  stage: deploy
+  script:
+    - echo "Deploying to production..."
+    - docker build -t myapp:latest .  # Build Docker image cho production
+    - docker run -d myapp:latest     # Chạy container trên production
+  only:
+    - main  # Chỉ deploy khi có thay đổi trên nhánh main
